@@ -181,5 +181,6 @@ async def on_message(message):
 
     await bot.process_commands(message)  # Traitement des autres commandes
 
-# Démarrage du bot avec le token d'authentification
-bot.run("TOKEN_ICI")
+#connexion du bot au serveur avec au token
+bot.run("Token_discorde")
+         
