@@ -1,4 +1,4 @@
-# Bot Discord
+# TP : Développement d’un BOT avec l’API discord
 
 Ce bot Discord est conçu pour répondre à diverses commandes et réagir à certains messages.
 
