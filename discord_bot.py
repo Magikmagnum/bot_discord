@@ -1,59 +1,58 @@
+# Importation des modules nécessaires
 import random
-import discord #import du module
+import discord
 from discord.ext import commands
 
-
-#Intents
+# Définition des intentions du bot
 intents = discord.Intents().all()
 
+# Création de l'instance du bot avec le préfixe de commande et les intentions spécifiées
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# Activation de la détection du contenu des messages
 intents.message_content = True
-# guilds = serveurs discords
+# Activation de la détection des guildes (serveurs Discord)
 intents.guilds = True
+# Activation de la détection des membres
 intents.members = True
 
-
-# fonction "on_ready" pour confirmer la bonne connexion du bot sur votre serveur
+# Fonction "on_ready" appelée lorsque le bot est prêt à interagir
 @bot.event
 async def on_ready():
-    print (f"{bot.user.name} s'est bien connecté !")
-    await bot.change_presence(activity=discord.Game(name="!help pour l'aide"))
+    print(f"{bot.user.name} s'est bien connecté !")  # Affichage d'un message de confirmation dans la console
+    await bot.change_presence(activity=discord.Game(name="!help pour l'aide"))  # Définition du statut du bot
 
-# Commande !ping
+# Commande !ping qui répond "pong"
 @bot.command()
 async def ping(ctx):
     await ctx.send("pong 🏓")
 
-# Commande !touché
+# Commande !touché qui répond "coulé ! ⛵"
 @bot.command()
 async def touché(ctx):
     await ctx.send("coulé ! ⛵")
 
-
-# Commande !members
+# Commande !members qui affiche la liste des membres du serveur
 @bot.command()
 async def members(ctx):
+    # Récupération des membres du serveur et de leurs rôles
     members_list = "\n".join([f"{member.display_name} - {', '.join([role.name for role in member.roles if role.name != '@everyone'])}" for member in ctx.guild.members])
     await ctx.send(f"Liste des membres sur le serveur :\n{members_list}")
 
-
-# Réactions automatiques
+# Réactions automatiques aux messages contenant "bonjour" ou "salut"
 @bot.event
 async def on_message(message):
-    # si l'auteur du message est identique à l'utilisateur du bot
+    # Vérifie si le message a été envoyé par le bot lui-même
     if message.author == bot.user:
         return
 
-    if "bonjour" in message.content.lower():
+    # Réagit avec un emoji aux messages contenant "bonjour" ou "salut"
+    if "bonjour" in message.content.lower() or "salut" in message.content.lower():
         await message.add_reaction("👋")
-    
-    if "salut" in message.content.lower():
-        await message.add_reaction("👋")
+        
+    await bot.process_commands(message)  # Traitement des autres commandes
 
-    await bot.process_commands(message)
-
-# Commande !joke
+# Commande !joke qui envoie une blague aléatoire parmi une liste prédéfinie
 jokes = [
     "Pourquoi les plongeurs plongent-ils toujours en arrière et jamais en avant ? Parce que sinon ils tombent dans le bateau.",
     "Quel est le comble pour un électricien ? De se faire électricienner.",
@@ -67,12 +66,15 @@ jokes = [
 async def joke(ctx):
     await ctx.send(random.choice(jokes))
 
-
+# Événement déclenché lorsqu'un nouveau membre rejoint le serveur
 @bot.event
 async def on_member_join(member):
-    channel = member.guild.system_channel  # Récupérer le canal système du serveur
+    channel = member.guild.system_channel  # Récupère le canal système du serveur
     if channel:
+        # Envoie un message de bienvenue avec une mention du nouveau membre et une invitation à utiliser !welcome
         await channel.send(f"Bienvenue {member.mention} sur le serveur ! Utilisez `!welcome` pour voir un message de bienvenue personnalisé.")
+
+# Liste des mots ou expressions considérés comme injurieux
 
 
 
@@ -161,27 +163,23 @@ banned_words = [
     "jean-foutre", "poltron"
 ]
 
+
 # Événement déclenché lorsqu'un message est envoyé sur le serveur
 @bot.event
 async def on_message(message):
-    # Vérifie si l'auteur du message est un bot (pour éviter que le bot ne se bannisse lui-même)
+    # Vérifie si l'auteur du message est un bot
     if message.author.bot:
         return
 
-    # Vérifie si le message contient un mot banni
+    # Vérifie si le message contient un mot interdit
     for word in banned_words:
         if word in message.content.lower():
-            # Bannit l'utilisateur
+            # Bannit l'utilisateur et envoie un message de notification
             await message.author.ban(reason="Utilisation d'une injure.")
-            # Envoie un message dans le canal de modération pour notifier du bannissement
             await message.channel.send(f"{message.author.mention} a été banni pour utilisation d'une injure.")
-
             break  # Sort de la boucle après le premier mot trouvé
 
-    # Continue le traitement des autres commandes et événements
-    await bot.process_commands(message)
+    await bot.process_commands(message)  # Traitement des autres commandes
 
-
-#connexion du bot au serveur avec au token
-bot.run("Token_discorde")
-         
+# Démarrage du bot avec le token d'authentification
+bot.run("TOKEN_ICI")
